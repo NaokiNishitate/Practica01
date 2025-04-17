@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administrar Registros</title>
+    <link rel="stylesheet" href="/static/styles.css">
+    <style>
+        /* Estilos adicionales para la página de administración */
+        .action-buttons {
+            display: flex;
+            gap: 5px;
+        }
+        
+        .delete-btn {
+            background-color: #dc3545;
+            padding: 5px 10px;
+            font-size: 14px;
+        }
+        
+        .delete-btn:hover {
+            background-color: #c82333;
+        }
+        
+        .registros-container {
+            margin-top: 30px;
+            overflow-x: auto;
+        }
+        
+        .no-registros {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Administración de Registros</h1>
+        
+        <div class="header-actions">
+            <a href="/" class="btn">Regresar al Formulario</a>
+            <span class="registros-count">Total registros: {{ registros|length }}</span>
+        </div>
+        
+        <div class="separator"></div>
+        
+        <div class="registros-container">
+            {% if registros %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>DNI</th>
+                        <th>Nombre</th>
+                        <th>Apellido</th>
+                        <th>Dirección</th>
+                        <th>Teléfono</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for registro in registros %}
+                    <tr>
+                        <td>{{ registro[0] }}</td>
+                        <td>{{ registro[1] }}</td>
+                        <td>{{ registro[2] }}</td>
+                        <td>{{ registro[3] }}</td>
+                        <td>{{ registro[4] or '-' }}</td>
+                        <td>{{ registro[5] or '-' }}</td>
+                        <td class="action-buttons">
+                            <form action="/eliminar/{{ registro[1] }}" method="post" 
+                                  onsubmit="return confirm('¿Está seguro que desea eliminar este registro?');">
+                                <button type="submit" class="delete-btn">Eliminar</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <div class="no-registros">
+                <p>No hay registros disponibles</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Modal para mensajes -->
+    <div id="messageModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <p id="modalMessage"></p>
+        </div>
+    </div>
+
+    <script>
+        // Mostrar mensaje si existe en la URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const mensaje = urlParams.get('mensaje');
+        
+        if (mensaje) {
+            document.getElementById('modalMessage').textContent = mensaje;
+            document.getElementById('messageModal').style.display = 'block';
+        }
+        
+        function closeModal() {
+            document.getElementById('messageModal').style.display = 'none';
+        }
+        
+        // Cerrar modal al hacer clic fuera del contenido
+        window.onclick = function(event) {
+            const modal = document.getElementById('messageModal');
+            if (event.target == modal) {
+                closeModal();
+            }
+        }
+    </script>
+</body>
+</html>
